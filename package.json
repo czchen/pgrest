@@ -41,7 +41,8 @@
   "devDependencies": {
     "mocha": "*",
     "supertest": "0.7.x",
-    "chai": "*"
+    "chai": "*",
+    "jscoverage": "~0.3.8"
   },
   "optionalDependencies": {}
 }

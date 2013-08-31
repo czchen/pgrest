@@ -18,7 +18,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "prepublish": "lsc -cj package.ls &&\nlsc -bc bin &&\nchmod 755 bin/cmd.js &&\nlsc -bc -o lib src",
+    "prepublish": "lsc -cj package.ls &&\nlsc -bc bin &&\nlsc -bc gruntfile.ls &&\nchmod 755 bin/cmd.js &&\nlsc -bc -o lib src",
     "postinstall": "lsc -cj package.ls &&\nlsc -bc bin &&\nchmod 755 bin/cmd.js &&\nlsc -bc -o lib src"
   },
   "engines": {

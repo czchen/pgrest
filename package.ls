@@ -18,6 +18,7 @@ scripts:
   prepublish: """
     lsc -cj package.ls &&
     lsc -bc bin &&
+    lsc -bc gruntfile.ls &&
     chmod 755 bin/cmd.js &&
     lsc -bc -o lib src
   """

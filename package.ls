@@ -46,4 +46,6 @@ devDependencies:
   supertest: \0.7.x
   chai: \*
   jscoverage: \~0.3.8
+  grunt: \~0.4.1
+  'grunt-mocha-cov': \~0.0.7
 optionalDependencies: {}

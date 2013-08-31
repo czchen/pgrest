@@ -1,5 +1,6 @@
 require! trycatch
 require! passport
+require! winston
 
 export function route (path, fn)
   (req, resp) ->
@@ -50,7 +51,7 @@ export function mount-auth (plx, app, middleware, config, cb_after_auth, cb_logo
   passport.deserializeUser (id, done) -> done null, id
 
   default_cb_logout = (req, res) ->
-    console.log "user logout"
+    winston.info "user logout"
     req.logout!
     res.redirect config.auth.logout_redirect
     
@@ -75,24 +76,24 @@ export function mount-auth (plx, app, middleware, config, cb_after_auth, cb_logo
       name: profile.name
       emails: profile.emails
       photos: profile.photos
-    console.log "user #{user.username} authzed by #{user.provider_name}.#{user.provider_id}"
-    #@FIXME: need to merge multiple authoziation profiles 
+    winston.info "user #{user.username} authzed by #{user.provider_name}.#{user.provider_id}"
+    #@FIXME: need to merge multiple authoziation profiles
     param = [collection: \users, q:{provider_id:user.provider_id, provider_name:user.provider_name}]
     [pgrest_select:res] <- plx.query "select pgrest_select($1)", param
     if res.paging.count == 0
-      [pgrest_insert:res] <- plx.query "select pgrest_insert($1)", [collection: \users, $: [user]]    
+      [pgrest_insert:res] <- plx.query "select pgrest_insert($1)", [collection: \users, $: [user]]
     [pgrest_select:res] <- plx.query "select pgrest_select($1)", param
     user.auth_id = res.entries[0]['_id']
-    console.log user
+    winston.info user
     done null, user
     
   for provider_name in config.auth.plugins
     provider_cfg = config.auth.providers_settings[provider_name]
     throw "#{provider_name} settings is required" unless provider_cfg
-    console.log "enable auth #{provider_name}"
+    winston.info "enable auth #{provider_name}"
     # passport settings
     provider_cfg['callbackURL'] = "http://#{config.host}:#{config.port}/auth/#{provider_name}/callback"
-    console.log provider_cfg
+    winston.info provider_cfg
     module_name = switch provider_name
                   case \google then "passport-google-oauth"
                   default "passport-#{provider_name}"
@@ -125,7 +126,7 @@ export function mount-model (plx, schema, name, _route=route)
     # text/csv;header=absent
     plx[method].call plx, param, it, (error) ->
       if error is /Stream unexpectedly ended/
-        console.log \TODOreconnect
+        winston.warn \TODOreconnect
       it { error }
   _route "#name/:_id" !->
     param = l: 1 fo: yes collection: "#schema.#name" q: { _id: @params._id }
@@ -155,7 +156,7 @@ export function mount-default (plx, schema, _route=route, cb)
   cols = for {scm, tbl} in rows
     schema ||= scm
     if seen[tbl]
-      console.log "#scm.#tbl not loaded, #tbl already in use"
+      winston.warn "#scm.#tbl not loaded, #tbl already in use"
     else
       seen[tbl] = true
       mount-model plx, scm, tbl, _route

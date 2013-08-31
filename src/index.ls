@@ -1,4 +1,5 @@
 require! plv8x
+require! winston
 exports.new = (conString, config, cb) ->
   throw "Expected: new(dsn, cb) where dsn is 'db', 'host/db' or 'tcp://host/db'" unless conString
   if typeof conString is \string
@@ -9,7 +10,7 @@ exports.new = (conString, config, cb) ->
   <- next!
   plx.boot = (cb) -> plx.ap (-> plv8x.require \pgrest .boot), [config], cb
   plx.conn.on \error ->
-    console.log \pgerror it
+    winston.error \pgerror it
   <- plx.boot
   <[ select upsert insert replace remove ]>.forEach (method) ->
     plx[method] = (param, cb, onError) ->
@@ -286,7 +287,7 @@ export function boot(config)
     PrimaryFieldOf = {}
     ColumnsOf = {}
     for {key, val, constraint} in plv8.execute SQL_PrimaryFieldInfo | val.length is 1
-      # console.log "PrimaryFieldOf(#key) = #val (#constraint)"
+      # winston.info "PrimaryFieldOf(#key) = #val (#constraint)"
       PrimaryFieldOf[key] = val.0
     for {name, columns} in plv8.execute SQL_ColumnsInfo
       ColumnsOf[name] = columns
